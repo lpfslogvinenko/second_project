@@ -1,0 +1,10 @@
+export function Header({ title, subtitle }) {
+  return (
+    <header className="app-header">
+      <div>
+        <h1>{title}</h1>
+        {subtitle ? <p className="muted">{subtitle}</p> : null}
+      </div>
+    </header>
+  );
+}
