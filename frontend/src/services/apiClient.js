@@ -1,4 +1,25 @@
-const base = import.meta.env.VITE_API_BASE_URL || "";
+function apiBase() {
+  const raw = (import.meta.env.VITE_API_BASE_URL || "").trim();
+  return raw.replace(/\/+$/, "");
+}
+
+/** True when fetch() failed before HTTP (locale-independent as far as possible). */
+export function isTransientNetworkError(err) {
+  if (err && typeof err.status === "number" && err.status > 0) {
+    return false;
+  }
+  const msg = String(err?.message || "").toLowerCase();
+  return (
+    msg.includes("failed to fetch") ||
+    msg.includes("networkerror") ||
+    msg.includes("network request failed") ||
+    msg.includes("load failed") ||
+    (msg.includes("fetch") && msg.includes("network")) ||
+    msg.includes("не удалось связаться") ||
+    msg.includes("не удалось выполнить") ||
+    msg.includes("aborted")
+  );
+}
 
 export function getToken() {
   return localStorage.getItem("ct_token");
@@ -16,7 +37,25 @@ async function apiFetch(path, options = {}) {
   if (options.body && !(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
-  const res = await fetch(`${base}${path}`, { ...options, headers });
+  const base = apiBase();
+  const url = `${base}${path}`;
+  let res;
+  try {
+    res = await fetch(url, { ...options, headers });
+  } catch (e) {
+    const hint =
+      !base &&
+      import.meta.env.PROD &&
+      " Укажите VITE_API_BASE_URL на Vercel (URL бэкенда Render, https://..., без слэша в конце).";
+    const network = isTransientNetworkError(e);
+    const err = new Error(
+      (network
+        ? `Не удалось связаться с API (${url}). Проверьте VITE_API_BASE_URL, CORS_ORIGIN на Render и что сервис не «спит».`
+        : e.message) + (hint || "")
+    );
+    err.cause = e;
+    throw err;
+  }
   if (!res.ok) {
     let detail = null;
     try {
