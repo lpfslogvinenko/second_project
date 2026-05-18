@@ -15,7 +15,7 @@ async function setupWebhook() {
   }
 
   const webhookUrl = `${BACKEND_URL}/telegram/webhook`;
-  const setWebhookUrl = `${PROXY_URL}/bot${BOT_TOKEN}/setWebhook?url=${encodeURIComponent(webhookUrl)}`;
+  const setWebhookUrl = `https://api.telegram.org/bot${BOT_TOKEN}/setWebhook?url=${encodeURIComponent(webhookUrl)}`;
 
   try {
     const response = await fetch(setWebhookUrl, { method: "POST" });
@@ -25,7 +25,7 @@ async function setupWebhook() {
     console.error("❌ Webhook setup failed:", err);
   }
 }
-// --------------------------------------------------------
+
 
 async function main() {
   await User.ensureSchema();
