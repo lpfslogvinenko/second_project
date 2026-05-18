@@ -27,6 +27,11 @@ async function handleUpdate(update) {
     return;
   }
 
+  if (text === '/appss_verify') {
+    // Отправляем ответ строго тем же сообщением (reply)
+    return sendMessage(chatId, 'appss_9bb0c9');
+  }
+
   const from = msg.from;
   if (!from) return;
 
