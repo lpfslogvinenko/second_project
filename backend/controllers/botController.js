@@ -30,6 +30,7 @@ async function handleUpdate(update) {
   if (cmd === "/appss_verify") {
     await send("appss_9bb0c9");
     return;
+  }
 }
 
   const from = msg.from;
