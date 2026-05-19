@@ -31,8 +31,7 @@ async function handleUpdate(update) {
     await send("appss_9bb0c9");
     return;
   }
-}
-
+  
   const from = msg.from;
   if (!from) return;
 
